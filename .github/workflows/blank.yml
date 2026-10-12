@@ -1,0 +1,62 @@
+name: Build debug APK
+
+# Manual trigger only. IMPORTANT: this workflow file must already exist on the repo's
+# default branch (main) before the "Run workflow" button appears in the Actions tab —
+# uploading it in the same commit as everything else is fine, just make sure it lands on main.
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Supports uploading the project as a single project.zip at the repo root (the easiest
+      # path from a phone browser: one file upload instead of dragging ~30 individual files
+      # and folders). If project.zip is present, unzip it over the repo root and remove it.
+      # If you instead uploaded the project as loose files/folders, this step does nothing.
+      - name: Unzip project if delivered as project.zip
+        run: |
+          if [ -f "project.zip" ]; then
+            echo "Found project.zip at repo root, extracting..."
+            unzip -o project.zip -d .
+            rm -f project.zip
+          else
+            echo "No project.zip found; assuming the project was uploaded as loose files."
+          fi
+
+      - name: Verify gradlew is present
+        run: |
+          if [ ! -f "gradlew" ]; then
+            echo "::error::gradlew not found at repo root after setup. Check that project.zip extracts files directly to the repo root (not into a nested subfolder), or that you uploaded the project's files directly to the repo root."
+            exit 1
+          fi
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+
+      - name: Run assembleDebug
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
