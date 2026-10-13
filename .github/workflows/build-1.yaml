@@ -14,8 +14,8 @@ jobs:
 
       - name: Unzip project if present
         run: |
-          if [ -f "DailyStack.zip" ]; then
-            echo "Found dailylearning"
+          if [ -f "project.zip" ]; then
+            echo "Found project.zip"
             unzip -o project.zip -d .
           elif [ -f "SmsSentinel.zip" ]; then
             echo "Found SmsSentinel.zip"
