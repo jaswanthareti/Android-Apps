@@ -1,4 +1,4 @@
-name: Location Sharing buol APK
+name: Location Sharing APK
 
 on:
   workflow_dispatch:
@@ -12,16 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Unzip project if present
+      - name: Unzip project.zip
         run: |
           if [ -f "project.zip" ]; then
             echo "Found project.zip"
             unzip -o project.zip -d .
-          elif [ -f "SmsSentinel.zip" ]; then
-            echo "Found SmsSentinel.zip"
-            unzip -o SmsSentinel.zip -d .
           else
-            echo "::error::No zip file found in repo root"
+            echo "::error::project.zip not found in repo root"
             exit 1
           fi
 
