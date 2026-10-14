@@ -6,6 +6,7 @@ on:
     branches: [ main ]
     paths:
       - 'DailyStack.zip'                 # run when the packaged zip is updated
+      - 'DailyStack/**'                  # run when the DailyStack project files change
       - 'app/**'                         # run when app sources change
       - 'gradle/**'                      # run when gradle scripts change
       - 'settings.gradle'
@@ -42,8 +43,8 @@ jobs:
           for f in "${FOUND[@]}"; do
             if grep -q "DailyStack" "$f"; then PICK="$f"; break; fi
           done
-          echo "Android project at: $(dirname \"$PICK\")"
-          echo "PROJECT_DIR=$(dirname \"$PICK\")" >> "$GITHUB_ENV"
+          echo "Android project at: $(dirname "$PICK")"
+          echo "PROJECT_DIR=$(dirname "$PICK")" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v4
         with:
