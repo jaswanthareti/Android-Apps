@@ -4,6 +4,15 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths:
+      - 'project.zip'                        # run when the packaged zip is updated
+      - 'app/**'                            # run when app sources change
+      - 'LocationSharing/**'                 # run when the LocationSharing project changes
+      - 'location-sharing/**'                # run when the location-sharing project changes
+      - 'gradle/**'                          # run when gradle scripts change
+      - 'settings.gradle'
+      - 'settings.gradle.kts'
+      - '.github/workflows/location-sharing-build.yaml' # run when this workflow file changes
 
 jobs:
   build:
