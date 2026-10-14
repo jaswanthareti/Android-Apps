@@ -1,4 +1,4 @@
-name: Build dailylearning APK
+name: Build DailyStack APK
 
 on:
   workflow_dispatch:
@@ -12,17 +12,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Unpack and locate Android project
+      - name: Unpack DailyStack.zip and locate Android project
         run: |
-          echo "Repo root contents:"
-          ls -la
-
-          # If the project was uploaded as a zip, unpack it first.
-          shopt -s nullglob
-          for z in ./*.zip; do
-            echo "Unzipping $z"
-            unzip -o -q "$z" -d .
-          done
+          if [ -f "DailyStack.zip" ]; then
+            echo "Found DailyStack.zip"
+            unzip -o DailyStack.zip -d .
+          else
+            echo "::error::DailyStack.zip not found in repo root"
+            exit 1
+          fi
 
           # Find the Gradle project (settings file), searching a few levels deep.
           mapfile -t FOUND < <(find . -maxdepth 6 -name .git -prune -o \( -name settings.gradle.kts -o -name settings.gradle \) -print)
@@ -37,8 +35,8 @@ jobs:
           for f in "${FOUND[@]}"; do
             if grep -q "DailyStack" "$f"; then PICK="$f"; break; fi
           done
-          echo "Android project at: $(dirname "$PICK")"
-          echo "PROJECT_DIR=$(dirname "$PICK")" >> "$GITHUB_ENV"
+          echo "Android project at: $(dirname \"$PICK\")"
+          echo "PROJECT_DIR=$(dirname \"$PICK\")" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v4
         with:
@@ -61,6 +59,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dailylearning-apk
+          name: DailyStack-apk
           path: "**/app/build/outputs/apk/debug/*.apk"
           if-no-files-found: error
