@@ -4,6 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths:
+      - 'DailyStack.zip'                 # run when the packaged zip is updated
+      - 'app/**'                         # run when app sources change
+      - 'gradle/**'                      # run when gradle scripts change
+      - 'settings.gradle'
+      - 'settings.gradle.kts'
+      - '.github/workflows/dl-build.yml' # run when this workflow file changes
 
 jobs:
   build:
