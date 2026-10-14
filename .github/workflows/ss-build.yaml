@@ -3,6 +3,14 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths:
+      - 'SmsSentinel.zip'                     # run when the packaged zip is updated
+      - 'SmsSentinel/**'                      # run when the SmsSentinel project files change
+      - '**/app/**'                           # run when app sources change in any extracted project
+      - 'gradle/**'                           # run when gradle scripts change
+      - 'settings.gradle'
+      - 'settings.gradle.kts'
+      - '.github/workflows/ss-build.yaml'     # run when this workflow file changes
 jobs:
   build:
     runs-on: ubuntu-latest
