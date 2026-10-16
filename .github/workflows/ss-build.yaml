@@ -5,11 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'SmsSentinel.zip'                     # run when the packaged zip is updated
-      - 'SmsSentinel/**'                      # run when the SmsSentinel project files change
-      - '**/app/**'                           # run when app sources change in any extracted project
-      - 'gradle/**'                           # run when gradle scripts change
-      - 'settings.gradle'
-      - 'settings.gradle.kts'
+      - 'SmsSentinel/**'                      # run when the extracted project files change
       - '.github/workflows/ss-build.yaml'     # run when this workflow file changes
 jobs:
   build:
@@ -27,7 +23,16 @@ jobs:
           gradle-version: 8.11.1
       - run: gradle assembleDebug --no-daemon
         working-directory: SmsSentinel
+      - name: Name the APK
+        working-directory: SmsSentinel
+        run: cp app/build/outputs/apk/debug/app-debug.apk Guardly.apk
+      - name: Print signing key (must be identical on every build, or Android refuses the update)
+        working-directory: SmsSentinel
+        continue-on-error: true
+        run: |
+          APKSIGNER="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)apksigner"
+          "$APKSIGNER" verify --print-certs Guardly.apk | grep -E "SHA-256|Signer #1 certificate DN" || true
       - uses: actions/upload-artifact@v4
         with:
-          name: SmsSentinel-apk
-          path: SmsSentinel/app/build/outputs/apk/debug/app-debug.apk
+          name: Guardly-apk
+          path: SmsSentinel/Guardly.apk
